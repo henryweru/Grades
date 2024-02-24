@@ -134,16 +134,25 @@ int main() {
         printf("Email: %s\n", students[studentIndex].email);
 
         // Display information for each unit and its corresponding grade as a table
-        printf("\nResults for %s:\n", students[studentIndex].first_name);
-        printf("| %-20s | %-20s | %-6s | %-5s |\n", "Unit", "Lecturer", "Score", "Grade");
-        printf("|----------------------|----------------------|--------|-------|\n");
+// Display information for each unit and its corresponding grade
+printf("\nResults for %s:\n", students[studentIndex].first_name);
+printf("| %-20s | %-20s | %-6s | %-5s |\n", "Unit", "Lecturer", "Score", "Grade");
+printf("|----------------------|----------------------|--------|-------|\n");
 
-        for (int i = 0; i < 7; ++i) {
-            printf("| %-20s | %-20s | %-6d | %-5c |\n", units[i].name, lectures[i].name, grades[i + (studentIndex * 7)].score, grades[i + (studentIndex * 7)].grade);
-        }
+for (int i = 0; i < 7; ++i) {
+    int gradeIndex = i + (studentIndex * 7);
 
-        // Add a line for better separation
-        printf("|----------------------|----------------------|--------|-------|\n");
+    printf("| %-20s | %-20s | %-6d | ", units[i].name, lectures[i].name, grades[gradeIndex].score);
+    
+    // Calculate and assign the grade based on the score
+    grades[gradeIndex].grade = calculate_grade(grades[gradeIndex].score);
+    
+    printf("%-5c |\n", grades[gradeIndex].grade);
+}
+
+// Add a line for better separation
+printf("|----------------------|----------------------|--------|-------|\n");
+
     } else {
         printf("Login failed\n");
     }
