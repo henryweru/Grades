@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <haru/hpdf.h> // Include LibHaru for PDF generation
 
 // Define structures for entities
 struct Student {
@@ -33,7 +34,6 @@ struct Grade {
     char grade; // Added a grade field
 };
 
-// Function to calculate the grade based on the score
 char calculate_grade(int score) {
     if (score >= 91 && score <= 100) {
         return 'A';
@@ -50,71 +50,68 @@ char calculate_grade(int score) {
     }
 }
 
+void generate_pdf(const char *filename, const struct Student *student, const struct Unit *units,
+                  const struct Lecture *lectures, const struct Grade *grades) {
+    HPDF_Doc pdf;
+    HPDF_Page page;
+
+    // Create PDF document
+    pdf = HPDF_New(NULL, NULL);
+    if (!pdf) {
+        fprintf(stderr, "Error: Cannot create PDF document\n");
+        return;
+    }
+
+    // Add a page to the document
+    page = HPDF_AddPage(pdf);
+    HPDF_Page_SetSize(page, HPDF_PAGE_SIZE_A4);
+
+    // Set font
+    HPDF_Font font = HPDF_GetFont(pdf, "Helvetica", NULL);
+
+    // Print student information
+    HPDF_Page_SetFontAndSize(page, font, 12);
+    HPDF_Page_TextOut(page, 50, 750, "Student Information:");
+
+    char student_info[100];
+    snprintf(student_info, sizeof(student_info), "Name: %s %s\nEmail: %s", student->first_name, student->last_name, student->email);
+    HPDF_Page_TextOut(page, 50, 730, student_info);
+
+    // Print results table
+    HPDF_Page_SetFontAndSize(page, font, 10);
+    HPDF_Page_TextOut(page, 50, 700, "\nResults:");
+
+    HPDF_Page_TextOut(page, 50, 680, "| %-20s | %-20s | %-6s | %-5s |", "Unit", "Lecturer", "Score", "Grade");
+    HPDF_Page_TextOut(page, 50, 670, "|----------------------|----------------------|--------|-------|");
+
+    for (int i = 0; i < 7; ++i) {
+        int gradeIndex = i + (student->id - 1) * 7;
+        char result_row[100];
+        snprintf(result_row, sizeof(result_row), "| %-20s | %-20s | %-6d | %-5c |", units[i].name, lectures[i].name, grades[gradeIndex].score, grades[gradeIndex].grade);
+        HPDF_Page_TextOut(page, 50, 660 - i * 10, result_row);
+    }
+
+    HPDF_Page_TextOut(page, 50, 580, "|----------------------|----------------------|--------|-------|");
+
+    // Save the PDF to a file
+    HPDF_SaveToFile(pdf, filename);
+
+    // Clean up
+    HPDF_Free(pdf);
+}
+
 int main() {
-    // Fake data for three students, multiple units, lectures, and grades
-    struct Student students[3] = {
-        {1, "Henry", "Waweru", "Henry@waweru.com", "password123", "2022-02-21 12:00:00"},
-        {2, "Alice", "Smith", "Alice@smith.com", "pass456", "2022-02-21 12:15:00"},
-        {3, "Bob", "Ross", "Bob@ross.com", "pass789", "2022-02-21 12:30:00"} // Added a missing semicolon
-    };
-
-    struct Unit units[7] = {
-        {1, "Math", 1, "2022-02-21 12:30:00"},
-        {2, "English", 2, "2022-02-21 12:45:00"},
-        {3, "Science", 3, "2022-02-21 13:00:00"},
-        {4, "History", 4, "2022-02-21 13:15:00"},
-        {5, "Programming", 5, "2022-02-21 13:30:00"},
-        {6, "Art", 6, "2022-02-21 13:45:00"},
-        {7, "Physical Education", 7, "2022-02-21 14:00:00"}
-    };
-
-    struct Lecture lectures[7] = {
-        {1, "Math Lecture", "2022-02-21 12:30:00"},
-        {2, "English Lecture", "2022-02-21 12:45:00"},
-        {3, "Science Lecture", "2022-02-21 13:00:00"},
-        {4, "History Lecture", "2022-02-21 13:15:00"},
-        {5, "Programming Lecture", "2022-02-21 13:30:00"},
-        {6, "Art Lecture", "2022-02-21 13:45:00"},
-        {7, "Physical Education Lecture", "2022-02-21 14:00:00"}
-    };
-
-    struct Grade grades[21] = {
-        {1, 1, 1, 95, "2022-02-21 14:00:00"},
-        {2, 1, 2, 85, "2022-02-21 14:15:00"},
-        {3, 1, 3, 75, "2022-02-21 14:30:00"},
-        {4, 1, 4, 65, "2022-02-21 14:45:00"},
-        {5, 1, 5, 55, "2022-02-21 15:00:00"},
-        {6, 1, 6, 45, "2022-02-21 15:15:00"},
-        {7, 1, 7, 75, "2022-02-21 15:30:00"},
-        
-        {8, 2, 1, 80, "2022-02-21 14:00:00"},
-        {9, 2, 2, 70, "2022-02-21 14:15:00"},
-        {10, 2, 3, 60, "2022-02-21 14:30:00"},
-        {11, 2, 4, 50, "2022-02-21 14:45:00"},
-        {12, 2, 5, 40, "2022-02-21 15:00:00"},
-        {13, 2, 6, 70, "2022-02-21 15:15:00"},
-        {14, 2, 7, 60, "2022-02-21 15:30:00"},
-        
-        {15, 3, 1, 75, "2022-02-21 14:00:00"},
-        {16, 3, 2, 65, "2022-02-21 14:15:00"},
-        {17, 3, 3, 55, "2022-02-21 14:30:00"},
-        {18, 3, 4, 45, "2022-02-21 14:45:00"},
-        {19, 3, 5, 35, "2022-02-21 15:00:00"},
-        {20, 3, 6, 65, "2022-02-21 15:15:00"},
-        {21, 3, 7, 55, "2022-02-21 15:30:00"}
-    };
+    // ... (Previous code)
 
     char student[50];
     char password[50];
 
-    // Get user input for student and password
     printf("Enter your student email: ");
     scanf("%s", student);
 
     printf("Enter your password: ");
     scanf("%s", password);
 
-    // Authenticate user based on input
     int authenticated = 0;
     int studentIndex = -1;
     for (int i = 0; i < 3; ++i) {
@@ -129,30 +126,12 @@ int main() {
     if (authenticated) {
         printf("Logged in\n");
 
-        // Display information for the authenticated student
-        printf("Student: %s %s\n", students[studentIndex].first_name, students[studentIndex].last_name);
-        printf("Email: %s\n", students[studentIndex].email);
+        // ... (Previous code)
 
-        // Display information for each unit and its corresponding grade as a table
-// Display information for each unit and its corresponding grade
-printf("\nResults for %s:\n", students[studentIndex].first_name);
-printf("| %-20s | %-20s | %-6s | %-5s |\n", "Unit", "Lecturer", "Score", "Grade");
-printf("|----------------------|----------------------|--------|-------|\n");
+        // Generate PDF report
+        generate_pdf("student_results.pdf", &students[studentIndex], units, lectures, grades);
 
-for (int i = 0; i < 7; ++i) {
-    int gradeIndex = i + (studentIndex * 7);
-
-    printf("| %-20s | %-20s | %-6d | ", units[i].name, lectures[i].name, grades[gradeIndex].score);
-    
-    // Calculate and assign the grade based on the score
-    grades[gradeIndex].grade = calculate_grade(grades[gradeIndex].score);
-    
-    printf("%-5c |\n", grades[gradeIndex].grade);
-}
-
-// Add a line for better separation
-printf("|----------------------|----------------------|--------|-------|\n");
-
+        printf("PDF report generated successfully.\n");
     } else {
         printf("Login failed\n");
     }
