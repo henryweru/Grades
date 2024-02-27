@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-
+#include <stdlib.h>
 // Define structures for entities
 struct Student {
     int id;
@@ -9,7 +9,12 @@ struct Student {
     char email[50];
     char password[50];
     char created_at[20];
+    char university[100]; // Add university field
+    int year_of_study;    // Add year of study field
+    char college[50];     // Add college field
+    char school[50];      // Add school field
 };
+
 
 struct Unit {
     int id;
@@ -28,9 +33,9 @@ struct Grade {
     int id;
     int student_id;
     int unit_id;
-    int score; // Represented as a percentage
+    int score; 
     char created_at[20];
-    char grade; // Added a grade field
+    char grade; 
 };
 
 char calculate_grade(int score) {
@@ -51,29 +56,29 @@ char calculate_grade(int score) {
 
 int main() {
     struct Student students[3] = {
-        {1, "Henry", "Waweru", "Henry@waweru.com", "password123", "2022-02-21 12:00:00"},
-        {2, "Alice", "Smith", "Alice@smith.com", "pass456", "2022-02-21 12:15:00"},
-        {3, "Bob", "Ross", "Bob@ross.com", "pass789", "2022-02-21 12:30:00"} // Added a missing semicolon
+        {1, "Henry", "Waweru", "Henry@waweru.com", "password123", "2022-02-21 12:00:00", "Jomo Kenyatta University", 1, "COHRED", "SOBE"},
+        {2, "Alice", "Smith", "Alice@smith.com", "pass456", "2022-02-21 12:15:00", "Jomo Kenyatta University", 1, "COHRED", "SOBE"},
+        {3, "Bob", "Ross", "Bob@ross.com", "pass789", "2022-02-21 12:30:00", "Jomo Kenyatta University", 1, "COHRED", "SOBE"}
     };
 
     struct Unit units[7] = {
-        {1, "Math", 1, "2022-02-21 12:30:00"},
-        {2, "English", 2, "2022-02-21 12:45:00"},
-        {3, "Science", 3, "2022-02-21 13:00:00"},
-        {4, "History", 4, "2022-02-21 13:15:00"},
-        {5, "Programming", 5, "2022-02-21 13:30:00"},
-        {6, "Art", 6, "2022-02-21 13:45:00"},
-        {7, "Physical Education", 7, "2022-02-21 14:00:00"}
+        {1, "Math For business", 1, "2022-02-21 12:30:00"},
+        {2, "Intro to business", 2, "2022-02-21 12:45:00"},
+        {3, "Computer Orgazition", 3, "2022-02-21 13:00:00"},
+        {4, "Fund. of Computer", 4, "2022-02-21 13:15:00"},
+        {5, "HIV/AIDs", 5, "2022-02-21 13:30:00"},
+        {6, "Communication", 6, "2022-02-21 13:45:00"},
+        {7, "Operating Systems", 7, "2022-02-21 14:00:00"}
     };
 
     struct Lecture lectures[7] = {
-        {1, "Math Lecture", "2022-02-21 12:30:00"},
-        {2, "English Lecture", "2022-02-21 12:45:00"},
-        {3, "Science Lecture", "2022-02-21 13:00:00"},
-        {4, "History Lecture", "2022-02-21 13:15:00"},
-        {5, "Programming Lecture", "2022-02-21 13:30:00"},
-        {6, "Art Lecture", "2022-02-21 13:45:00"},
-        {7, "Physical Education Lecture", "2022-02-21 14:00:00"}
+        {1, "Mr. Mwangi", "2022-02-21 12:30:00"},
+        {2, "Miss Wangechi", "2022-02-21 12:45:00"},
+        {3, "Mr. Omondi", "2022-02-21 13:00:00"},
+        {4, "Sir Wilfred", "2022-02-21 13:15:00"},
+        {5, "Mr. John", "2022-02-21 13:30:00"},
+        {6, "Humprey", "2022-02-21 13:45:00"},
+        {7, "Prof Jane", "2022-02-21 14:00:00"}
     };
 
     struct Grade grades[21] = {
@@ -126,8 +131,13 @@ int main() {
         printf("Logged in\n");
 
         printf("Student: %s %s\n", students[studentIndex].first_name, students[studentIndex].last_name);
-        printf("Email: %s\n", students[studentIndex].email);
+    printf("Email: %s\n", students[studentIndex].email);
+    printf("University: %s\n", students[studentIndex].university); // Display university
+    printf("Year of Study: %d\n", students[studentIndex].year_of_study); // Display year of study
+    printf("College: %s\n", students[studentIndex].college); // Display college
+    printf("School: %s\n", students[studentIndex].school);
 
+    
 printf("\nResults for %s:\n", students[studentIndex].first_name);
 printf("| %-20s | %-20s | %-6s | %-5s |\n", "Unit", "Lecturer", "Score", "Grade");
 printf("|----------------------|----------------------|--------|-------|\n");
